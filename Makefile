@@ -1,4 +1,4 @@
-.PHONY: install format test clean
+.PHONY: install format format-check test clean
 
 VENV_NAME := venv
 PYTHON := $(VENV_NAME)/bin/python
