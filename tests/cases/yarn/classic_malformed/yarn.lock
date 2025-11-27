@@ -1,0 +1,3 @@
+# Malformed: Missing version line
+test-package@1.0.0:
+  resolution "https://registry.yarnpkg.com/test-package/-/test-package-1.0.0.tgz#..."

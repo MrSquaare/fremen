@@ -1,0 +1,25 @@
+name: "Pull Request"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    name: Checks
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install
+        run: make install
+
+      - name: Run Format Check
+        run: make format-check
+
+      - name: Run Tests
+        run: make test

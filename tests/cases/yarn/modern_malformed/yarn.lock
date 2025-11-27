@@ -1,0 +1,6 @@
+# Malformed: Missing version property
+"test-package@1.0.0":
+  resolution: "test-package@1.0.0"
+  checksum: "..."
+  languageName: node
+  linkType: hard
