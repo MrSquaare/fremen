@@ -120,7 +120,7 @@ class TestRunner:
 
         try:
             process_result = subprocess.run(
-                command_arguments, capture_output=True, text=True
+                command_arguments, capture_output=True, text=True, timeout=60
             )
 
             duration = time.time() - start_time
@@ -183,6 +183,13 @@ class TestRunner:
 
             return TestResult(test_case, True, duration)
 
+        except subprocess.TimeoutExpired:
+            return TestResult(
+                test_case,
+                False,
+                time.time() - start_time,
+                "Test timed out after 60 seconds",
+            )
         except Exception as exception:
             return TestResult(
                 test_case, False, time.time() - start_time, str(exception)
