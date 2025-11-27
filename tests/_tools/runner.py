@@ -83,10 +83,22 @@ class TestRunner:
         """Prepare the test environment by copying the script to the tools directory."""
         shutil.copy(self.source_script_path, self.test_script_destination)
 
+        # Rename dot_git to .git for testing
+        dot_git_path = os.path.join(self.cases_directory, "ignored", "dot_git")
+        git_path = os.path.join(self.cases_directory, "ignored", ".git")
+        if os.path.exists(dot_git_path):
+            os.rename(dot_git_path, git_path)
+
     def teardown_environment(self):
         """Clean up the test environment."""
         if os.path.exists(self.test_script_destination):
             os.remove(self.test_script_destination)
+
+        # Rename .git back to dot_git
+        dot_git_path = os.path.join(self.cases_directory, "ignored", "dot_git")
+        git_path = os.path.join(self.cases_directory, "ignored", ".git")
+        if os.path.exists(git_path):
+            os.rename(git_path, dot_git_path)
 
     def run_test_case(self, test_case: TestCase) -> TestResult:
         """Execute a single test case and return the result."""

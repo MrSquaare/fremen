@@ -8,7 +8,7 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    name: Setup
+    name: Checks
 
     steps:
       - uses: actions/checkout@v6
