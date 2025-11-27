@@ -1,0 +1,4 @@
+packages:
+  # Malformed: Missing colon
+  '/test-package/1.0.0'
+    resolution: { integrity: sha512-infected }

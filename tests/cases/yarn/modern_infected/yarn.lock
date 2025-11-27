@@ -1,0 +1,4 @@
+# yarn lockfile v2
+"spaced-package@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "spaced-package@npm:2.0.0"

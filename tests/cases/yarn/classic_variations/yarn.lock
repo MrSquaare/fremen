@@ -1,0 +1,6 @@
+# yarn lockfile v1
+'test-package@^1.0.0':
+  version "1.0.0"
+
+spaced-package@^2.0.0:
+  version "2.0.0"

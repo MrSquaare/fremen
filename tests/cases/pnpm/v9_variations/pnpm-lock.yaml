@@ -1,0 +1,6 @@
+lockfileVersion: "9.0"
+packages:
+  test-package@1.0.0:
+    resolution: { integrity: sha512-... }
+  "spaced-package@2.0.0":
+    resolution: { integrity: sha512-... }
