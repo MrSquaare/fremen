@@ -8,16 +8,20 @@ BLACK := $(VENV_NAME)/bin/black
 install:
 	python3 -m venv $(VENV_NAME)
 	$(PIP) install -r requirements.txt
+	go mod download
+
+build: 
+	go build -o ./dist/fremen ./cmd/fremen 
 
 format:
-	$(BLACK) .
+	go fmt ./...
 
-format-check:
-	$(BLACK) --check .
+format-check: format
 
-test:
+test: build
 	$(PYTHON) tests/_tools/runner.py
 
 clean:
 	rm -rf $(VENV_NAME)
 	find . -type d -name "__pycache__" -exec rm -rf {} +
+	go mod tidy
