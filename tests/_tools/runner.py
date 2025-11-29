@@ -74,9 +74,9 @@ class TestRunner:
 
         # Paths for the script under test
         self.source_script_path = os.path.join(
-            os.path.dirname(test_root_directory), "fremen.py"
+            os.path.dirname(test_root_directory), "dist", "fremen"
         )
-        self.test_script_destination = os.path.join(self.tools_directory, "fremen.py")
+        self.test_script_destination = os.path.join(self.tools_directory, "fremen")
         self.database_path = os.path.join(self.tools_directory, "database.txt")
 
     def setup_environment(self):
@@ -106,7 +106,7 @@ class TestRunner:
 
         # Construct the base command
         command_arguments = (
-            [sys.executable, self.test_script_destination]
+            [self.test_script_destination]
             + test_case.target_paths
             + ["--database", self.database_path]
         )
