@@ -17,9 +17,6 @@ type DisplayConfig struct {
 	IncludeNodeModules bool
 	ExcludeRegex       string
 	FullReport         bool
-	JSONOutput         bool
-	ColorOutput        bool
-	EmojiOutput        bool
 }
 
 func yesNo(b bool) string {
@@ -60,9 +57,10 @@ func PrintCLIReport(results []scanner.ScanResult, cfg scanner.ScanConfig, showFu
 		IncludeGit:         cfg.IncludeGit,
 		IncludeNodeModules: cfg.IncludeNodeModules,
 		ExcludeRegex:       exclude,
+		FullReport:         showFull,
 	}
 
-	displayResults, summary := summarizeScanResults(results, showFull)
+	displayResults, summary := summarizeScanResults(results, displayCfg.FullReport)
 
 	fmt.Println()
 	fmt.Println(style.StyledText(style.EmojiText("🔍", "Scan Configuration"), style.ColorBlue))
@@ -74,10 +72,6 @@ func PrintCLIReport(results []scanner.ScanResult, cfg scanner.ScanConfig, showFu
 	fmt.Printf("%-22s: %s\n", "Include .git", yesNo(displayCfg.IncludeGit))
 	fmt.Printf("%-22s: %s\n", "Include node_modules", yesNo(displayCfg.IncludeNodeModules))
 	fmt.Printf("%-22s: %s\n", "Exclude Regex", stringOrDash(displayCfg.ExcludeRegex))
-	fmt.Printf("%-22s: %s\n", "Full Report", yesNo(displayCfg.FullReport))
-	fmt.Printf("%-22s: %s\n", "JSON Output", yesNo(displayCfg.JSONOutput))
-	fmt.Printf("%-22s: %s\n", "Color Output", yesNo(displayCfg.ColorOutput))
-	fmt.Printf("%-22s: %s\n", "Emoji Output", yesNo(displayCfg.EmojiOutput))
 	fmt.Println()
 
 	fmt.Println(style.StyledText(style.EmojiText("🚀", "Project Reports"), style.ColorBlue))

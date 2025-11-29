@@ -194,7 +194,7 @@ func collectTasksForPath(cfg ScanConfig, path string) ([]scanTask, error) {
 
 	err = filepath.WalkDir(base, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
-			return err
+			return walkErr
 		}
 
 		if cfg.ExcludeRegex != nil && cfg.ExcludeRegex.MatchString(path) {

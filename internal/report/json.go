@@ -16,9 +16,6 @@ type JSONConfig struct {
 	IncludeNodeModules bool     `json:"include_node_modules"`
 	ExcludeRegex       string   `json:"exclude_regex"`
 	FullReport         bool     `json:"full_report"`
-	JSONOutput         bool     `json:"json_output"`
-	ColorOutput        bool     `json:"color_output"`
-	EmojiOutput        bool     `json:"emoji_output"`
 }
 
 func PrintJSONReport(results []scanner.ScanResult, cfg scanner.ScanConfig, showFull bool) {
@@ -38,9 +35,10 @@ func PrintJSONReport(results []scanner.ScanResult, cfg scanner.ScanConfig, showF
 		IncludeGit:         cfg.IncludeGit,
 		IncludeNodeModules: cfg.IncludeNodeModules,
 		ExcludeRegex:       exclude,
+		FullReport:         showFull,
 	}
 
-	displayResults, summary := summarizeScanResults(results, showFull)
+	displayResults, summary := summarizeScanResults(results, jsonCfg.FullReport)
 
 	outResults := make([]map[string]any, 0, len(displayResults))
 	for _, r := range displayResults {

@@ -11,6 +11,7 @@ install:
 	go mod download
 
 build: 
+	mkdir -p ./dist
 	go build -o ./dist/fremen ./cmd/fremen 
 
 format:
