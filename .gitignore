@@ -1,7 +1,5 @@
-# Virtual Environment
-venv/
+# Build
+dist/
 
 # macOS
 .DS_Store
-
-dist
