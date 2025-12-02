@@ -19,8 +19,8 @@ format:
 
 format-check: format
 
-test: build
-	$(PYTHON) tests/_tools/runner.py
+test:
+	go test ./tests/... -v
 
 clean:
 	rm -rf $(VENV_NAME)
