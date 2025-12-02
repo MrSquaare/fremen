@@ -7,13 +7,23 @@ on:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
-    name: Checks
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Checks (${{ matrix.os }})
+    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
 
       - name: Install
         run: make install
