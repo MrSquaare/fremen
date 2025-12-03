@@ -1,5 +1,6 @@
 .PHONY: install build lint lint-fix test test-coverage clean
 
+GO_SOURCE = ./cmd/fremen
 DIST_DIR = ./dist
 GO_BINARY = $(DIST_DIR)/fremen
 COVER_DIR = ./coverdata
@@ -8,9 +9,10 @@ COVER_OUT = coverage.out
 install:
 	go mod download
 
-build: 
-	mkdir -p ./dist
-	go build -o $(GO_BINARY) ./cmd/fremen
+build:
+	rm -rf $(DIST_DIR)
+	mkdir -p $(DIST_DIR)
+	go build -o $(GO_BINARY) $(GO_SOURCE)
 
 lint:
 	golangci-lint run ./...
@@ -29,4 +31,6 @@ test-coverage:
 	go tool cover -func=$(COVER_OUT)
 
 clean:
-	rm -f $(GO_BINARY)
+	rm -rf $(DIST_DIR) $(COVER_DIR) $(COVER_OUT)
+
+all: install build
