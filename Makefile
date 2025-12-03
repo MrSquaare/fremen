@@ -1,4 +1,4 @@
-.PHONY: install build format format-check test clean
+.PHONY: install build format format-check lint test clean
 
 GO_BINARY = ./dist/fremen
 
@@ -10,10 +10,13 @@ build:
 	go build -o $(GO_BINARY) ./cmd/fremen
 
 format:
-	go fmt ./...
+	golangci-lint fmt ./...
 
 format-check:
-	@test -z $$(gofmt -l .)
+	@test -z $$(golangci-lint fmt -d ./...)
+
+lint:
+	golangci-lint run ./...
 
 test:
 	go test ./tests/... -v
