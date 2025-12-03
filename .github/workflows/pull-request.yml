@@ -6,6 +6,32 @@ on:
       - main
 
 jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.os }})
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install
+        run: make install
+
+      - name: Run Build
+        run: make build
+
   check:
     runs-on: ubuntu-latest
     name: Check
@@ -49,5 +75,11 @@ jobs:
       - name: Install
         run: make install
 
-      - name: Run Tests
-        run: make test
+      - name: Run Test
+        run: make test-coverage
+
+      - name: Upload coverage reports to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
