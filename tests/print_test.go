@@ -18,7 +18,8 @@ func (s *FremenTestSuite) Test_Print_Infected() {
 	output, exitCode := s.runFremen(target, "--no-color")
 	s.Equal(1, exitCode)
 
-	expected := fmt.Sprintf(`
+	expected := fmt.Sprintf(`Loaded 2 infected package versions from database.txt.
+
 🔍 Scan Configuration
 ─────────────────────
 Paths                 : %s
@@ -54,7 +55,8 @@ func (s *FremenTestSuite) Test_Print_Clean() {
 	output, exitCode := s.runFremen(target, "--no-color")
 	s.Equal(0, exitCode)
 
-	expected := fmt.Sprintf(`
+	expected := fmt.Sprintf(`Loaded 2 infected package versions from database.txt.
+
 🔍 Scan Configuration
 ─────────────────────
 Paths                 : %s
@@ -85,7 +87,8 @@ func (s *FremenTestSuite) Test_Print_Clean_FullReport() {
 	output, exitCode := s.runFremen(target, "--no-color", "--full-report")
 	s.Equal(0, exitCode)
 
-	expected := fmt.Sprintf(`
+	expected := fmt.Sprintf(`Loaded 2 infected package versions from database.txt.
+
 🔍 Scan Configuration
 ─────────────────────
 Paths                 : %s
@@ -118,7 +121,8 @@ func (s *FremenTestSuite) Test_Print_NoLockfile() {
 	output, exitCode := s.runFremen(target, "--no-color")
 	s.Equal(1, exitCode)
 
-	expected := fmt.Sprintf(`
+	expected := fmt.Sprintf(`Loaded 2 infected package versions from database.txt.
+
 🔍 Scan Configuration
 ─────────────────────
 Paths                 : %s
@@ -148,6 +152,18 @@ func (s *FremenTestSuite) Test_Print_NoColor() {
 	target := filepath.Join(s.fixturesDir, "cases", "npm", "v1_infected")
 	output, _ := s.runFremen(target, "--no-color")
 	s.NotContains(output, "\x1b[")
+}
+
+func (s *FremenTestSuite) Test_Print_NoColorEnv() {
+	target := filepath.Join(s.fixturesDir, "cases", "npm", "v1_infected")
+
+	s.T().Setenv("NO_COLOR", "1")
+	output, _ := s.runFremen(target)
+	s.NotContains(output, "\x1b[")
+
+	s.T().Setenv("NO_COLOR", "0")
+	output, _ = s.runFremen(target)
+	s.Contains(output, "\x1b[")
 }
 
 func (s *FremenTestSuite) Test_Print_NoEmoji() {

@@ -1,58 +1,59 @@
 package style
 
-import "runtime"
+import (
+	"fmt"
+	"io"
+	"os"
+	"runtime"
+
+	"github.com/mattn/go-colorable"
+)
+
+type Color string
 
 const (
-	ColorRed    = "\033[91m"
-	ColorGreen  = "\033[92m"
-	ColorYellow = "\033[93m"
-	ColorBlue   = "\033[94m"
-	ColorCyan   = "\033[96m"
-	ColorReset  = "\033[0m"
-	ColorBold   = "\033[1m"
+	ColorRed    Color = "\033[91m"
+	ColorGreen  Color = "\033[92m"
+	ColorYellow Color = "\033[93m"
+	ColorBlue   Color = "\033[94m"
+	ColorCyan   Color = "\033[96m"
+	ColorReset  Color = "\033[0m"
+	ColorBold   Color = "\033[1m"
 )
 
-type OutputPreferences struct {
-	Color bool
-	Emoji bool
+type TermStyler struct {
+	Color  bool
+	Emoji  bool
+	Writer io.Writer
 }
 
-var (
-	ConsoleSupportsColor    = detectConsoleColorSupport()
-	GlobalOutputPreferences = OutputPreferences{Color: true, Emoji: true}
-)
-
-func detectConsoleColorSupport() bool {
-	return runtime.GOOS != "windows"
-}
-
-func getColorSequence(code string) string {
-	if !ConsoleSupportsColor || !GlobalOutputPreferences.Color {
-		return ""
+func NewTermStyler(color, emoji bool) *TermStyler {
+	var writer io.Writer
+	if runtime.GOOS == "windows" {
+		writer = colorable.NewColorable(os.Stdout)
+	} else {
+		writer = os.Stdout
 	}
-	return code
+	return &TermStyler{
+		Color:  color,
+		Emoji:  emoji,
+		Writer: writer,
+	}
 }
 
-func StyledText(text, colorCode string) string {
-	prefix := getColorSequence(colorCode)
-	if prefix == "" {
-		return text
+func (t *TermStyler) PrintLnColor(text string, colorCode Color) {
+	out := text
+	if t.Color {
+		out = string(colorCode) + text + string(ColorReset)
 	}
-	suffix := getColorSequence(ColorReset)
-	return prefix + text + suffix
+	fmt.Fprintln(t.Writer, out)
 }
 
-func GetEmoji(symbol string) string {
-	if !GlobalOutputPreferences.Emoji {
-		return ""
+func (t *TermStyler) EmojiText(symbol, text string) string {
+	out := text
+	if t.Emoji {
+		out = symbol + " " + text
 	}
-	return symbol
-}
 
-func EmojiText(symbol, text string) string {
-	e := GetEmoji(symbol)
-	if e != "" {
-		return e + " " + text
-	}
-	return text
+	return out
 }

@@ -51,23 +51,23 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	if len(paths) == 0 {
 		paths = []string{"."}
 	}
-
-	if flagNoColor {
-		style.GlobalOutputPreferences.Color = false
+	var color, emoji = true, true
+	if noColorEnv, ok := os.LookupEnv("NO_COLOR"); (ok && noColorEnv != "0") || flagNoColor {
+		color = false
 	}
 	if flagNoEmoji {
-		style.GlobalOutputPreferences.Emoji = false
+		emoji = false
 	}
+
+	termStyler := style.NewTermStyler(color, emoji)
 
 	var excludeRegex *regexp.Regexp
 	if flagExclude != "" {
 		r, err := regexp.Compile(flagExclude)
 		if err != nil {
-			fmt.Fprintln(os.Stderr,
-				style.StyledText(
-					fmt.Sprintf("Invalid exclude regex: %v", err),
-					style.ColorRed,
-				),
+			termStyler.PrintLnColor(
+				fmt.Sprintf("Invalid exclude regex: %v", err),
+				style.ColorRed,
 			)
 			os.Exit(1)
 		}
@@ -86,28 +86,26 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	db := database.New()
 	if err := db.Load(cfg.DatabasePath); err != nil {
 		if !flagJSON {
-			fmt.Fprintln(os.Stderr,
-				style.StyledText(
-					fmt.Sprintf("Error: %s", err),
-					style.ColorRed,
-				),
+			termStyler.PrintLnColor(
+				fmt.Sprintf("Error: %s", err),
+				style.ColorRed,
 			)
 		}
 		os.Exit(1)
 	}
 	if !flagJSON {
-		fmt.Fprintln(os.Stderr,
-			style.StyledText(
-				fmt.Sprintf("Loaded %d infected package versions from %s.", db.EntryCount(), filepath.Base(db.LoadedPath())),
-				style.ColorBlue,
-			),
+		termStyler.PrintLnColor(
+			fmt.Sprintf("Loaded %d infected package versions from %s.", db.EntryCount(), filepath.Base(db.LoadedPath())),
+			style.ColorBlue,
 		)
+
 	}
 
 	results, err := scanner.ExecuteScan(cfg, db)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			style.StyledText(fmt.Sprintf("Scan error: %v", err), style.ColorRed),
+		termStyler.PrintLnColor(
+			fmt.Sprintf("Scan error: %v", err),
+			style.ColorRed,
 		)
 		os.Exit(1)
 	}
@@ -115,7 +113,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	if flagJSON {
 		report.PrintJSONReport(results, cfg, flagFullReport)
 	} else {
-		report.PrintCLIReport(results, cfg, flagFullReport)
+		report.PrintCLIReport(*termStyler, results, cfg, flagFullReport)
 	}
 
 	return nil
