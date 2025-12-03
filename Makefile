@@ -6,6 +6,8 @@ GO_BINARY = $(DIST_DIR)/fremen
 COVER_DIR = ./coverdata
 COVER_OUT = coverage.out
 
+all: install build
+
 install:
 	go mod download
 
@@ -32,5 +34,3 @@ test-coverage:
 
 clean:
 	rm -rf $(DIST_DIR) $(COVER_DIR) $(COVER_OUT)
-
-all: install build
