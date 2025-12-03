@@ -1,4 +1,4 @@
-.PHONY: install build format format-check lint test clean
+.PHONY: install build lint lint-fix test clean
 
 GO_BINARY = ./dist/fremen
 
@@ -9,14 +9,11 @@ build:
 	mkdir -p ./dist
 	go build -o $(GO_BINARY) ./cmd/fremen
 
-format:
-	golangci-lint fmt ./...
-
-format-check:
-	@test -z $$(golangci-lint fmt -d ./...)
-
 lint:
 	golangci-lint run ./...
+
+lint-fix:
+	golangci-lint run ./... --fix
 
 test:
 	go test ./tests/... -v
