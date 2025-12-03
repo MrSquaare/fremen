@@ -6,14 +6,34 @@ on:
       - main
 
 jobs:
-  checks:
+  check:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
-    name: Checks (${{ matrix.os }})
+    name: Check (${{ matrix.os }})
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version-file: .tool-versions
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }})
     timeout-minutes: 5
 
     steps:
@@ -28,9 +48,6 @@ jobs:
 
       - name: Install
         run: make install
-
-      - name: Run Format Check
-        run: make format-check
 
       - name: Run Tests
         run: make test
