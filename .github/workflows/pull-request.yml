@@ -7,19 +7,19 @@ on:
 
 jobs:
   check:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    runs-on: ${{ matrix.os }}
-    name: Check (${{ matrix.os }})
+    runs-on: ubuntu-latest
+    name: Check
     timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
 
       - name: Run Golangci-lint
         uses: golangci/golangci-lint-action@v9
