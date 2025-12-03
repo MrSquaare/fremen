@@ -1,4 +1,4 @@
-.PHONY: install build lint lint-fix test test-coverage clean
+.PHONY: all install build lint lint-fix test test-coverage clean
 
 GO_SOURCE = ./cmd/fremen
 DIST_DIR = ./dist
