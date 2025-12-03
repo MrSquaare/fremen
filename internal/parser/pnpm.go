@@ -42,7 +42,7 @@ func parsePnpmLockfile(path string, db *database.VulnerabilityDatabase) ([]Vulne
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var issues []Vulnerability
 	sc := bufio.NewScanner(f)

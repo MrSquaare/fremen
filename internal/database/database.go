@@ -48,11 +48,11 @@ func (db *VulnerabilityDatabase) Load(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("database not found at %q\nPlease provide a valid path using --database or ensure database.txt exists.", path)
+			return fmt.Errorf("database not found at %q; please provide a valid path using --database or ensure database.txt exists", path)
 		}
 		return fmt.Errorf("failed to open database: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	newEntries := make(map[string]map[string]struct{})
 	count := 0

@@ -36,12 +36,12 @@ func (s *FremenTestSuite) SetupSuite() {
 }
 
 func (s *FremenTestSuite) TearDownSuite() {
-	os.Remove(s.binaryPath)
+	_ = os.Remove(s.binaryPath)
 
 	gitPath := filepath.Join(s.fixturesDir, "cases", "filtering", ".git")
 	dotGitPath := filepath.Join(s.fixturesDir, "cases", "filtering", "dot_git")
 	if _, err := os.Stat(gitPath); err == nil {
-		os.Rename(gitPath, dotGitPath)
+		_ = os.Rename(gitPath, dotGitPath)
 	}
 }
 

@@ -23,10 +23,7 @@ var (
 )
 
 func detectConsoleColorSupport() bool {
-	if runtime.GOOS == "windows" {
-		return false
-	}
-	return true
+	return runtime.GOOS != "windows"
 }
 
 func getColorSequence(code string) string {
