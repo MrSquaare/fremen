@@ -4,28 +4,32 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
 
 func (s *FremenTestSuite) SetupSuite() {
-	cwd, err := os.Getwd()
-	s.Require().NoError(err)
+	_, testFile, _, ok := runtime.Caller(0)
+	s.Require().True(ok, "Failed to determine main test file location")
 
-	projectRoot := cwd
-	if filepath.Base(cwd) == "tests" {
-		projectRoot = filepath.Dir(cwd)
-	}
+	testsDir := filepath.Dir(testFile)
 
 	s.binaryPath = filepath.Join(os.TempDir(), "fremen-test-bin")
 
-	cmd := exec.Command("go", "build", "-o", s.binaryPath, filepath.Join(projectRoot, "cmd", "fremen", "main.go"))
+	buildArgs := []string{"build", "-o", s.binaryPath}
+	_, coverageEnabled := os.LookupEnv("GOCOVERDIR")
+	if coverageEnabled {
+		buildArgs = append(buildArgs, "-cover", "-coverpkg=../...")
+	}
+	buildArgs = append(buildArgs, "../cmd/fremen")
+
+	cmd := exec.Command("go", buildArgs...)
 	output, err := cmd.CombinedOutput()
 	s.Require().NoError(err, "Failed to build fremen: %s", string(output))
 
-	s.fixturesDir = filepath.Join(projectRoot, "tests", "fixtures")
-	s.databasePath = filepath.Join(s.fixturesDir, "database.txt")
+	s.fixturesDir = filepath.Join(testsDir, "fixtures")
 
 	dotGitPath := filepath.Join(s.fixturesDir, "cases", "filtering", "dot_git")
 	gitPath := filepath.Join(s.fixturesDir, "cases", "filtering", ".git")
@@ -33,6 +37,8 @@ func (s *FremenTestSuite) SetupSuite() {
 		err = os.Rename(dotGitPath, gitPath)
 		s.Require().NoError(err)
 	}
+
+	s.databasePath = filepath.Join(s.fixturesDir, "database.txt")
 }
 
 func (s *FremenTestSuite) TearDownSuite() {
