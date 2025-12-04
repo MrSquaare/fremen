@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -47,16 +48,17 @@ type projectEntry struct {
 func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResult, error) {
 	// 1. collect tasks concurrently
 	var tasks []scanTask
+	var errs []error
 	for _, p := range cfg.TargetPaths {
 		found, err := collectTasksForPath(cfg, p)
 		if err != nil {
-			return nil, err
+			errs = append(errs, err)
 		}
 		tasks = append(tasks, found...)
 	}
 
 	if len(tasks) == 0 {
-		return nil, nil
+		return nil, errors.Join(errs...)
 	}
 
 	workers := workerCount()
@@ -78,7 +80,7 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 				fullPath := filepath.Join(job.Dir, job.Lockfile)
 				issues, err := parserFn(fullPath, db)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "warning: unable to parse %s: %v\n", fullPath, err)
+					errs = append(errs, fmt.Errorf("parse %s: %w", fullPath, err))
 				}
 
 				jobResults <- scanResultItem{
@@ -138,7 +140,7 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 		})
 	}
 
-	return scanResults, nil
+	return scanResults, errors.Join(errs...)
 }
 
 func isLockfile(name string) bool {
@@ -192,9 +194,12 @@ func collectTasksForPath(cfg ScanConfig, path string) ([]scanTask, error) {
 	base := abs
 	tasks := make([]scanTask, 0)
 
+	walkErrors := []error{}
+
 	err = filepath.WalkDir(base, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
-			return walkErr
+			walkErrors = append(walkErrors, fmt.Errorf("walk %q: %w", base, walkErr))
+			return nil
 		}
 
 		if cfg.ExcludeRegex != nil && cfg.ExcludeRegex.MatchString(path) {
@@ -225,7 +230,11 @@ func collectTasksForPath(cfg ScanConfig, path string) ([]scanTask, error) {
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("walk %q: %w", base, err)
+		return nil, err
+	}
+
+	if len(walkErrors) > 0 {
+		return tasks, errors.Join(walkErrors...)
 	}
 
 	return tasks, nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -103,11 +104,19 @@ func runRoot(cmd *cobra.Command, args []string) error {
 
 	results, err := scanner.ExecuteScan(cfg, db)
 	if err != nil {
-		termStyler.PrintLnColor(
-			fmt.Sprintf("Scan error: %v", err),
-			style.ColorRed,
-		)
-		os.Exit(1)
+		if errors.Is(err, os.ErrNotExist) {
+			termStyler.PrintLnColor(
+				fmt.Sprintf("Scan error: %v", err),
+				style.ColorRed,
+			)
+			os.Exit(1)
+		}
+		if !flagJSON {
+			termStyler.PrintLnColor(
+				fmt.Sprintf("Scan error: %v", err),
+				style.ColorYellow,
+			)
+		}
 	}
 
 	if flagJSON {
