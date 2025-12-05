@@ -53,7 +53,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	if len(paths) == 0 {
 		paths = []string{"."}
 	}
-	if noColorEnv, ok := os.LookupEnv("NO_COLOR"); (ok && noColorEnv != "0") || flagNoColor {
+	if _, ok := os.LookupEnv("NO_COLOR"); ok || flagNoColor {
 		color.NoColor = true
 	} else {
 		color.NoColor = false

@@ -64,7 +64,7 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 	workers := workerCount()
 	jobs := make(chan scanTask)
 	jobResults := make(chan scanResultItem)
-	jobErrs := make(chan error, workers)
+	var errsMu sync.Mutex
 
 	var wg sync.WaitGroup
 	wg.Add(workers)
@@ -81,7 +81,10 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 				fullPath := filepath.Join(job.Dir, job.Lockfile)
 				issues, err := parserFn(fullPath, db)
 				if err != nil {
-					jobErrs <- fmt.Errorf("parse %s: %w", fullPath, err)
+					errsMu.Lock()
+					errs = append(errs, fmt.Errorf("parse %s: %w", fullPath, err))
+					errsMu.Unlock()
+					continue
 				}
 
 				jobResults <- scanResultItem{
@@ -103,7 +106,6 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 	go func() {
 		wg.Wait()
 		close(jobResults)
-		close(jobErrs)
 	}()
 
 	// 2. aggregate scanResultItem per project
@@ -125,10 +127,6 @@ func ExecuteScan(cfg ScanConfig, db *database.VulnerabilityDatabase) ([]ScanResu
 		if len(jobResult.Issues) > 0 {
 			entry.Issues = append(entry.Issues, jobResult.Issues...)
 		}
-	}
-
-	for e := range jobErrs {
-		errs = append(errs, e)
 	}
 
 	// 3. deduplicate to ScanResult

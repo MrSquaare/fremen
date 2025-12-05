@@ -86,14 +86,15 @@ func (s *FremenTestSuite) Test_NPM_V2_Clean() {
 func (s *FremenTestSuite) Test_NPM_Empty() {
 	target := filepath.Join(s.fixturesDir, "cases", "npm", "empty")
 	report, exitCode := s.runFremenJSON(target)
-	s.Equal(0, exitCode)
+	s.Equal(1, exitCode)
+	s.Equal(0, report.Summary.TotalProjects)
 	s.Equal(0, report.Summary.InfectedProjects)
 }
 
 func (s *FremenTestSuite) Test_NPM_Malformed() {
 	target := filepath.Join(s.fixturesDir, "cases", "npm", "malformed")
 	_, exitCode := s.runFremenJSON(target)
-	s.Equal(0, exitCode)
+	s.Equal(1, exitCode)
 }
 
 func (s *FremenTestSuite) Test_NPM_Recursive() {
