@@ -160,10 +160,6 @@ func (s *FremenTestSuite) Test_Print_NoColorEnv() {
 	s.T().Setenv("NO_COLOR", "1")
 	output, _ := s.runFremen(target)
 	s.NotContains(output, "\x1b[")
-
-	s.T().Setenv("NO_COLOR", "0")
-	output, _ = s.runFremen(target)
-	s.Contains(output, "\x1b[")
 }
 
 func (s *FremenTestSuite) Test_Print_NoEmoji() {

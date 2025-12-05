@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/MrSquaare/fremen/internal/database"
@@ -52,23 +53,21 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	if len(paths) == 0 {
 		paths = []string{"."}
 	}
-	var color, emoji = true, true
 	if noColorEnv, ok := os.LookupEnv("NO_COLOR"); (ok && noColorEnv != "0") || flagNoColor {
-		color = false
+		color.NoColor = true
+	} else {
+		color.NoColor = false
 	}
 	if flagNoEmoji {
-		emoji = false
+		style.NoEmoji = true
 	}
-
-	termStyler := style.NewTermStyler(color, emoji)
 
 	var excludeRegex *regexp.Regexp
 	if flagExclude != "" {
 		r, err := regexp.Compile(flagExclude)
 		if err != nil {
-			termStyler.PrintLnColor(
+			color.Red(
 				fmt.Sprintf("Invalid exclude regex: %v", err),
-				style.ColorRed,
 			)
 			os.Exit(1)
 		}
@@ -87,17 +86,15 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	db := database.New()
 	if err := db.Load(cfg.DatabasePath); err != nil {
 		if !flagJSON {
-			termStyler.PrintLnColor(
+			color.Red(
 				fmt.Sprintf("Error: %s", err),
-				style.ColorRed,
 			)
 		}
 		os.Exit(1)
 	}
 	if !flagJSON {
-		termStyler.PrintLnColor(
+		color.Blue(
 			fmt.Sprintf("Loaded %d infected package versions from %s.", db.EntryCount(), filepath.Base(db.LoadedPath())),
-			style.ColorBlue,
 		)
 
 	}
@@ -105,16 +102,14 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	results, err := scanner.ExecuteScan(cfg, db)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			termStyler.PrintLnColor(
+			color.Red(
 				fmt.Sprintf("Scan error: %v", err),
-				style.ColorRed,
 			)
 			os.Exit(1)
 		}
 		if !flagJSON {
-			termStyler.PrintLnColor(
+			color.Yellow(
 				fmt.Sprintf("Scan error: %v", err),
-				style.ColorYellow,
 			)
 		}
 	}
@@ -122,7 +117,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 	if flagJSON {
 		report.PrintJSONReport(results, cfg, flagFullReport)
 	} else {
-		report.PrintCLIReport(*termStyler, results, cfg, flagFullReport)
+		report.PrintCLIReport(results, cfg, flagFullReport)
 	}
 
 	return nil
