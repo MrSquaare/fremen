@@ -7,6 +7,7 @@
 - [Getting started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+- [Building](#building)
 - [Testing](#testing)
 
 ## Guidelines
@@ -21,7 +22,7 @@ This guide is written for UNIX-like systems (Linux, macOS). Users on Windows or 
 
 ### Prerequisites
 
-- [Python 3.7+](https://www.python.org/downloads/)
+- [Go 1.25.4+](https://go.dev/doc/install/)
 - [Make](https://www.gnu.org/software/make/)
 
 ### Installation
@@ -38,16 +39,36 @@ git clone https://github.com/MrSquaare/fremen.git
 make install
 ```
 
-## Testing
+## Building
 
-Format the code:
+Build the project:
 
 ```shell script
-make format
+make build
 ```
 
-Run functional tests:
+## Testing
+
+Lint the code:
+
+```shell script
+make lint
+```
+
+Lint the code with automatic fixes:
+
+```shell script
+make lint-fix
+```
+
+Run integration tests:
 
 ```shell script
 make test
+```
+
+Run integration tests with coverage report:
+
+```shell script
+make test-coverage
 ```

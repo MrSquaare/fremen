@@ -1,5 +1,9 @@
-# Virtual Environment
-venv/
+# Build
+dist/
+
+# Test
+coverdata/
+coverage.out
 
 # macOS
 .DS_Store

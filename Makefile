@@ -1,23 +1,36 @@
-.PHONY: install format format-check test clean
+.PHONY: all install build lint lint-fix test test-coverage clean
 
-VENV_NAME := venv
-PYTHON := $(VENV_NAME)/bin/python
-PIP := $(VENV_NAME)/bin/pip
-BLACK := $(VENV_NAME)/bin/black
+GO_SOURCE = ./cmd/fremen
+DIST_DIR = ./dist
+GO_BINARY = $(DIST_DIR)/fremen
+COVER_DIR = ./coverdata
+COVER_OUT = coverage.out
+
+all: install build
 
 install:
-	python3 -m venv $(VENV_NAME)
-	$(PIP) install -r requirements.txt
+	go mod download
 
-format:
-	$(BLACK) .
+build:
+	rm -rf $(DIST_DIR)
+	mkdir -p $(DIST_DIR)
+	go build -o $(GO_BINARY) $(GO_SOURCE)
 
-format-check:
-	$(BLACK) --check .
+lint:
+	golangci-lint run ./...
+
+lint-fix:
+	golangci-lint run ./... --fix
 
 test:
-	$(PYTHON) tests/_tools/runner.py
+	go test ./tests/... -v -count=1
+
+test-coverage:
+	rm -rf $(COVER_DIR) $(COVER_OUT)
+	mkdir -p $(COVER_DIR)
+	GOCOVERDIR=$(abspath $(COVER_DIR)) go test ./tests/... -v -count=1
+	go tool covdata textfmt -i=$(COVER_DIR) -o=$(COVER_OUT)
+	go tool cover -func=$(COVER_OUT)
 
 clean:
-	rm -rf $(VENV_NAME)
-	find . -type d -name "__pycache__" -exec rm -rf {} +
+	rm -rf $(DIST_DIR) $(COVER_DIR) $(COVER_OUT)

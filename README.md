@@ -27,7 +27,7 @@ Fremen is designed for performance, utilizing parallel execution to scan large d
 
 ### Built with
 
-- [Python 3](https://www.python.org/)
+- [Golang](https://go.dev/)
 
 ### Acknowledgments
 
@@ -43,63 +43,52 @@ The code has been written with the help of AI tools.
 
 ### Prerequisites
 
-- Python 3.7 or higher installed on your system. You can download it from [python.org](https://www.python.org/downloads/).
+- Go 1.25+ installed on your system. You can download it from [go.dev](https://go.dev/dl/).
 
 ### Installation
 
-1. Clone the repository:
+1. Download the binary from the [Releases](https://github.com/MrSquaare/fremen/releases) page
 
-```shell script
-git clone https://github.com/MrSquaare/fremen.git
-cd fremen
-```
-
-2. Ensure the script is executable:
-
-```shell script
-chmod +x fremen.py
-```
-
-3. (Optional) Download or create a `database.txt` file containing the list of infected packages. By default, Fremen looks for `database.txt` where the script is located.
+2. Download or create a `database.txt` file containing the list of infected packages. By default, Fremen looks for `database.txt` where the script is located.
 
 ## Using
 
 Run the scanner against your project directories:
 
 ```shell script
-./fremen.py [paths...]
+./fremen [paths...]
 ```
 
 ### Common Options
 
 - **Recursive Scan:** Scan the current directory and all subdirectories.
   ```shell script
-  ./fremen.py -r
+  ./fremen -r
   ```
 
 - **Include Ignored Directories:** By default, `.git` and `node_modules` are ignored. You can include them if needed:
   ```shell script
-  ./fremen.py -r --include-git --include-node-modules
+  ./fremen -r --include-git --include-node-modules
   ```
 
 - **Specify Database:** Use a custom database file.
   ```shell script
-  ./fremen.py -d /path/to/database.txt
+  ./fremen -d /path/to/database.txt
   ```
 
 - **Full Report:** Show all projects, including clean ones.
   ```shell script
-  ./fremen.py --full-report
+  ./fremen --full-report
   ```
 
 - **JSON Output:** Generate a machine-readable JSON report.
   ```shell script
-  ./fremen.py --json
+  ./fremen --json
   ```
 
 For a full list of options, run:
 ```shell script
-./fremen.py --help
+./fremen --help
 ```
 
 ## Contributing
