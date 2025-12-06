@@ -16,7 +16,11 @@ func (s *FremenTestSuite) SetupSuite() {
 
 	testsDir := filepath.Dir(testFile)
 
-	s.binaryPath = filepath.Join(os.TempDir(), "fremen-test-bin")
+	binName := "fremen-test-bin"
+	if runtime.GOOS == "windows" {
+		binName += ".exe"
+	}
+	s.binaryPath = filepath.Join(os.TempDir(), binName)
 
 	buildArgs := []string{"build", "-o", s.binaryPath}
 	_, coverageEnabled := os.LookupEnv("GOCOVERDIR")
