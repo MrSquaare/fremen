@@ -1,5 +1,7 @@
 # Fremen
 
+> **⚠️ ARCHIVED**: This project is no longer maintained. We recommend using [OSV Scanner](https://github.com/google/osv-scanner) instead, which provides comprehensive vulnerability scanning across multiple ecosystems with active support and regular updates.
+
 A fast, parallelized security scanner for detecting infected packages in lockfiles.
 
 ## Table of Contents
